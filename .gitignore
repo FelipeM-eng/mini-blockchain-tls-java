@@ -1,0 +1,35 @@
+# --- Maven ---
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.restore
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# --- Compiled class files ---
+*.class
+
+# --- IDEs (VS Code, IntelliJ, Eclipse) ---
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+.settings/
+.project
+.classpath
+.factorypath
+
+# --- OS temporaries ---
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# --- Logs & VM ---
+*.log
+hs_err_pid*
+replay_pid*
