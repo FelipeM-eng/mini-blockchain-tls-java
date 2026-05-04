@@ -7,13 +7,11 @@ pom.xml.restore
 release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
 
 # --- Compiled class files ---
 *.class
 
-# --- IDEs (VS Code, IntelliJ, Eclipse) ---
+# --- IDEs ---
 .vscode/
 .idea/
 *.iml
@@ -24,13 +22,16 @@ buildNumber.properties
 .classpath
 .factorypath
 
-# --- OS temporaries ---
+# --- OS ---
 Thumbs.db
 Desktop.ini
 .DS_Store
 
-# --- Logs & VM ---
+# --- Logs & JVM ---
 *.log
 hs_err_pid*
 replay_pid*
-target/
+
+# --- Temp files ---
+*.swp
+*~
