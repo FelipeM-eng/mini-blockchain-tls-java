@@ -4,21 +4,39 @@ import pt.ipvc.ersc.blockchain.utils.HashUtil;
 
 public class Block {
 
-    public String data; 
-    public String previousHash; 
+    public String data;
+    public String previousHash;
     public String hash;
-    public long timestamp; 
+    public long timestamp;
     public int nonce;
 
+    // criar bloco novo
     public Block(String data, String previousHash) {
+
         this.data = data;
         this.previousHash = previousHash;
         this.timestamp = System.currentTimeMillis();
+
         this.hash = calculateHash();
     }
 
-    // calcula o hash com base em todos os dados
+    // reconstruir bloco vindo da rede
+    public Block(String data,
+                 String previousHash,
+                 long timestamp,
+                 int nonce,
+                 String hash) {
+
+        this.data = data;
+        this.previousHash = previousHash;
+        this.timestamp = timestamp;
+        this.nonce = nonce;
+        this.hash = hash;
+    }
+
+    // hash depende de tudo
     public String calculateHash() {
+
         return HashUtil.sha256(
                 previousHash +
                 timestamp +
@@ -32,11 +50,21 @@ public class Block {
 
         String target = "0".repeat(difficulty);
 
-        while (!hash.substring(0, difficulty).equals(target)) {
+        while (!hash.startsWith(target)) {
             nonce++;
             hash = calculateHash();
         }
 
         System.out.println("Bloco minerado: " + hash);
+    }
+
+    // converter para string para enviar pela rede
+    public String toNetworkString() {
+
+        return data + "|" +
+               previousHash + "|" +
+               timestamp + "|" +
+               nonce + "|" +
+               hash;
     }
 }

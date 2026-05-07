@@ -1,26 +1,36 @@
 package pt.ipvc.ersc.blockchain.app;
 
-import pt.ipvc.ersc.blockchain.core.Blockchain;
+import pt.ipvc.ersc.blockchain.core.Block;
+import pt.ipvc.ersc.blockchain.network.Node;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
-        Blockchain bc = new Blockchain();
+        // criar nós
+        Node nodeA = new Node(5000);
+        Node nodeB = new Node(5001);
 
-        bc.addBlock("Bloco 1");
-        bc.addBlock("Bloco 2");
-        bc.addBlock("Bloco 3");
+        // começar servidores
+        nodeA.startServer();
+        nodeB.startServer();
 
-        System.out.println("Blockchain válida? " + bc.isChainValid());
+        // dar tempo aos sockets
+        Thread.sleep(2000);
 
-        // teste de ataque
-        // bc.chain.get(1).data = "HACKED";
-        // bc.chain.get(1).nonce = 999;
-        // bc.chain.get(2).previousHash = "123";
-        // bc.chain.get(1).hash = "0000fakehash";
+        // nodeA minera bloco
+        Block block = nodeA.mineBlock("samuel enviou 10 coins");
 
-        System.out.println("Depois de alterar:");
-        System.out.println("Blockchain válida? " + bc.isChainValid());
+        // enviar para nodeB
+        nodeA.sendBlock(block, "localhost", 5001);
+
+        Thread.sleep(2000);
+
+        // verificar chains
+        System.out.println("\nNode A válida? " +
+                nodeA.getBlockchain().isChainValid());
+
+        System.out.println("Node B válida? " +
+                nodeB.getBlockchain().isChainValid());
     }
 }
