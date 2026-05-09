@@ -63,7 +63,7 @@ public class Node {
                             System.out.println("[NODE " + port + "] Bloco adicionado!");
                             System.out.println(
                                     "[NODE " + port + "] Chain size: "
-                                    + blockchain.chain.size()
+                                    + blockchain.size()
                             );
 
                         } else {
@@ -112,7 +112,7 @@ public class Node {
                 blockchain.getLatestBlock().hash
         );
 
-        block.mineBlock(blockchain.difficulty);
+        block.mineBlock(blockchain.getDifficulty());
 
         // adicionar localmente
         blockchain.addReceivedBlock(block);
