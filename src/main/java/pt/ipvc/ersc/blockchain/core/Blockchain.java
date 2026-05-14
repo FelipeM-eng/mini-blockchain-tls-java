@@ -24,6 +24,13 @@ public final class Blockchain {
     private static final String GENESIS_PREVIOUS_HASH = "0";
     private static final String GENESIS_DATA          = "Genesis Block";
 
+    // Valores fixos para que o bloco génesis seja determinístico — idêntico
+    // em todos os nós, independentemente de quando arrancam. Sem isto, cada
+    // nó teria um génesis com timestamp/hash diferente e não conseguiriam
+    // sincronizar a partir do bloco 1.
+    private static final long   GENESIS_TIMESTAMP     = 0L;
+    private static final int    GENESIS_NONCE         = 0;
+
     // E definimos o encadeamento da cadeia como uma lista de blocos.
     private final List<Block> chain;
 
@@ -68,18 +75,19 @@ public final class Blockchain {
    
     /**
     Cria o bloco inicial da cadeia.
-    Usa o construtor Block(String data, String previousHash).
-    previousHash = "0" por convenção — não existe bloco anterior.
+    Génesis com timestamp/nonce fixos — hash é totalmente determinístico,
+    logo igual em todos os nós. Não é minerado: o génesis é um caso
+    especial que não precisa de satisfazer o PoW (a regra de PoW só se
+    aplica a blocos validados em isValidNewBlock, e o génesis é
+    excluído desse caminho — ver loop em isChainValid que começa em i=1).
      */
     private Block createGenesisBlock() {
-        // Dado que o bloco genesis é criado internamente ao ser chamado pelo construtor principal
-        Block genesis = new Block(GENESIS_DATA, GENESIS_PREVIOUS_HASH);
-
-        // quando mineramos o bloco génesis, então chamamos o método mineBlock() do bloco, passando a dificuldade configurada.
-        genesis.mineBlock(this.difficulty);
-
-        // então retornamos o bloco génesis criado e minerado.
-        return genesis;
+        return new Block(
+            GENESIS_DATA,
+            GENESIS_PREVIOUS_HASH,
+            GENESIS_TIMESTAMP,
+            GENESIS_NONCE
+        );
     }
 
     /**

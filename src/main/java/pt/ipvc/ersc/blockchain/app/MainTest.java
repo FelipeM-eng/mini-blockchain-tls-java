@@ -57,13 +57,17 @@ public class MainTest {
               "0".equals(bc.getLatestBlock().getPreviousHash()));
     }
 
-    /** O hash de um bloco minerado deve começar com 'difficulty' zeros. */
-    private static void testProofOfWork() {
-        int difficulty = 3;
-        Blockchain bc = new Blockchain(difficulty);
-        String prefix = "0".repeat(difficulty);
-        check("Hash do génesis satisfaz PoW (difficulty=" + difficulty + ")",
-              bc.getLatestBlock().getHash().startsWith(prefix));
+    /** O hash de um bloco minerado deve começar com 'difficulty' zeros.
+         *  O génesis não é minerado por desígnio (é determinístico para
+         *  que todos os nós concordem nele); por isso testamos o PoW
+         *  num bloco normal adicionado a seguir. */
+        private static void testProofOfWork() throws Exception {
+            int difficulty = 3;
+            Blockchain bc = new Blockchain(difficulty);
+            bc.addBlock("bloco de teste para PoW");
+            String prefix = "0".repeat(difficulty);
+            check("Hash de bloco minerado satisfaz PoW (difficulty=" + difficulty + ")",
+                bc.getLatestBlock().getHash().startsWith(prefix));
     }
 
     /** Blocos minerados localmente são adicionados e a cadeia continua válida. */

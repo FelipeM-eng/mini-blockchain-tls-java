@@ -44,6 +44,22 @@ public class Block {
     }
 
     /**
+         * Cria um bloco com timestamp e nonce fixos.
+         * Usado para o bloco génesis: como todos os campos são determinísticos
+         * (constantes), o hash resultante é idêntico em qualquer instância da
+         * Blockchain — propriedade essencial para que nós independentes
+         * concordem no mesmo génesis e possam validar blocos uns dos outros.
+         */
+        public Block(String data, String previousHash, long timestamp, int nonce) {
+            this.data         = data;
+            this.previousHash = previousHash;
+            this.timestamp    = timestamp;
+            this.nonce        = nonce;
+            this.hash         = calculateHash();
+        }
+
+
+    /**
      * Reconstrói um bloco a partir de campos recebidos da rede.
      * Não recalcula nem revalida nada — essa responsabilidade pertence à
      * Blockchain (isValidNewBlock). Aqui apenas se reconstroi o objecto tal
