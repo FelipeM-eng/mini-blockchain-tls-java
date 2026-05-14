@@ -109,7 +109,7 @@ public class Node {
 
         Block block = new Block(
                 data,
-                blockchain.getLatestBlock().hash
+                blockchain.getLatestBlock().getHash()
         );
 
         block.mineBlock(blockchain.getDifficulty());

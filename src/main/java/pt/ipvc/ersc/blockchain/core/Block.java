@@ -2,56 +2,88 @@ package pt.ipvc.ersc.blockchain.core;
 
 import pt.ipvc.ersc.blockchain.utils.HashUtil;
 
+/**
+ * Block — unidade fundamental da blockchain.
+ *
+ * Imutabilidade:
+ *  - data, previousHash e timestamp são final: definidos no construtor e nunca
+ *    mais mudam. Garantem que o conteúdo histórico de um bloco aceite na cadeia
+ *    não pode ser alterado sem detecção (a alteração quebra a regra de
+ *    integridade em Blockchain.isValidNewBlock).
+ *  - nonce e hash mudam apenas durante mineBlock(); após a mineração ficam
+ *    estáveis. Não são final apenas porque a mineração precisa de os ajustar
+ *    iterativamente.
+ *
+ * Todos os campos são private. O acesso de leitura faz-se por getters; não há
+ * setters públicos. Isto impede que outras classes mutilem um bloco já minerado
+ * — propriedade essencial para a noção de "registo imutável" em blockchain.
+ *
+ * Responsável: Samuel Ferreira (33846).
+ */
 public class Block {
 
-    public String data;
-    public String previousHash;
-    public String hash;
-    public long timestamp;
-    public int nonce;
+    private final String data;
+    private final String previousHash;
+    private final long timestamp;
 
-    // criar bloco novo
+    private int nonce;
+    private String hash;
+
+    /**
+     * Cria um bloco novo a partir de dados locais.
+     * O timestamp é capturado no momento da criação; o nonce começa a 0 e o
+     * hash inicial é calculado imediatamente (será depois refinado por
+     * mineBlock).
+     */
     public Block(String data, String previousHash) {
-
-        this.data = data;
+        this.data         = data;
         this.previousHash = previousHash;
-        this.timestamp = System.currentTimeMillis();
-
-        this.hash = calculateHash();
+        this.timestamp    = System.currentTimeMillis();
+        this.nonce        = 0;
+        this.hash         = calculateHash();
     }
 
     /**
-    * Cria um bloco com timestamp e nonce fixos.
-    * Usado para o bloco génesis: como todos os campos são determinísticos
-    * (constantes), o hash resultante é idêntico em qualquer instância da
-    * Blockchain — propriedade essencial para que nós independentes
-    * concordem no mesmo génesis e possam validar blocos uns dos outros.
-    */
-    public Block(String data, String previousHash, long timestamp, int nonce) {
-        this.data         = data;
-        this.previousHash = previousHash;
-        this.timestamp    = timestamp;
-        this.nonce        = nonce;
-        this.hash         = calculateHash(); // determinístico — sem System.currentTimeMillis()
-    }
+         * Cria um bloco com timestamp e nonce fixos.
+         * Usado para o bloco génesis: como todos os campos são determinísticos
+         * (constantes), o hash resultante é idêntico em qualquer instância da
+         * Blockchain — propriedade essencial para que nós independentes
+         * concordem no mesmo génesis e possam validar blocos uns dos outros.
+         */
+        public Block(String data, String previousHash, long timestamp, int nonce) {
+            this.data         = data;
+            this.previousHash = previousHash;
+            this.timestamp    = timestamp;
+            this.nonce        = nonce;
+            this.hash         = calculateHash();
+        }
 
-    // reconstruir bloco vindo da rede
+
+    /**
+     * Reconstrói um bloco a partir de campos recebidos da rede.
+     * Não recalcula nem revalida nada — essa responsabilidade pertence à
+     * Blockchain (isValidNewBlock). Aqui apenas se reconstroi o objecto tal
+     * como foi serializado pelo emissor.
+     */
     public Block(String data,
                  String previousHash,
                  long timestamp,
                  int nonce,
                  String hash) {
-
-        this.data = data;
+        this.data         = data;
         this.previousHash = previousHash;
-        this.timestamp = timestamp;
-        this.nonce = nonce;
-        this.hash = hash;
+        this.timestamp    = timestamp;
+        this.nonce        = nonce;
+        this.hash         = hash;
     }
 
-    // hash depende de tudo
+    /**
+     * Calcula o SHA-256 dos campos que definem a identidade do bloco.
+     * Não escreve em this.hash — devolve o valor para quem chama decidir o
+     * que fazer (mineBlock atualiza; isValidNewBlock compara com o hash
+     * armazenado para detectar adulteração).
+     */
     public String calculateHash() {
-
         return HashUtil.sha256(
                 previousHash +
                 timestamp +
@@ -60,10 +92,14 @@ public class Block {
         );
     }
 
-    // mineração
+    /**
+     * Proof-of-Work: incrementa nonce até o hash começar com 'difficulty' zeros.
+     * Operação determinística dado (data, previousHash, timestamp) — a partir
+     * destes três, o nonce/hash resultantes são os primeiros que satisfazem
+     * a dificuldade.
+     */
     public void mineBlock(int difficulty) {
-
-        String target = "0".repeat(difficulty);
+        final String target = "0".repeat(difficulty);
 
         while (!hash.startsWith(target)) {
             nonce++;
@@ -73,13 +109,43 @@ public class Block {
         System.out.println("Bloco minerado: " + hash);
     }
 
-    // converter para string para enviar pela rede
+    /**
+     * Serialização para envio em rede.
+     * Formato pipe-delimited com 5 campos por esta ordem:
+     *   data | previousHash | timestamp | nonce | hash
+     *
+     * Limitação conhecida: se 'data' contiver o caracter '|', a desserialização
+     * parte-se. Resolvido em commit posterior (codificação Base64 do data).
+     */
     public String toNetworkString() {
-
         return data + "|" +
                previousHash + "|" +
                timestamp + "|" +
                nonce + "|" +
                hash;
+    }
+
+    // ------------------------------------------------------------------
+    // Getters (acesso de leitura — não há setters por desígnio)
+    // ------------------------------------------------------------------
+
+    public String getData() {
+        return data;
+    }
+
+    public String getPreviousHash() {
+        return previousHash;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public int getNonce() {
+        return nonce;
+    }
+
+    public String getHash() {
+        return hash;
     }
 }
