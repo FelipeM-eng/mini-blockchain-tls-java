@@ -54,7 +54,7 @@ public class MainTest {
         Blockchain bc = new Blockchain();
         check("Cadeia inicia com génesis (size=1)", bc.size() == 1);
         check("Génesis tem previousHash='0'",
-              "0".equals(bc.getLatestBlock().previousHash));
+              "0".equals(bc.getLatestBlock().getPreviousHash()));
     }
 
     /** O hash de um bloco minerado deve começar com 'difficulty' zeros. */
@@ -63,7 +63,7 @@ public class MainTest {
         Blockchain bc = new Blockchain(difficulty);
         String prefix = "0".repeat(difficulty);
         check("Hash do génesis satisfaz PoW (difficulty=" + difficulty + ")",
-              bc.getLatestBlock().hash.startsWith(prefix));
+              bc.getLatestBlock().getHash().startsWith(prefix));
     }
 
     /** Blocos minerados localmente são adicionados e a cadeia continua válida. */

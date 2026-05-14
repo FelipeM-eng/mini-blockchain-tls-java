@@ -104,7 +104,7 @@ public final class Blockchain {
 
         // e então criamos um novo bloco usando o construtor Block(String data, String previousHash), passando os dados recebidos e o hash do último bloco da cadeia.
         Block previousBlock = getLatestBlock();
-        Block newBlock      = new Block(data, previousBlock.hash);
+        Block newBlock      = new Block(data, previousBlock.getHash());
 
         // quando é minerado o bloco, então chamamos o método mineBlock() do bloco, passando a dificuldade configurada.
         newBlock.mineBlock(this.difficulty);
@@ -166,19 +166,19 @@ public final class Blockchain {
         Objects.requireNonNull(previousBlock, "previousBlock não pode ser nulo.");
 
         // Regra 1 — Encadeamento: o bloco tem de apontar para o anterior correcto.
-        if (!newBlock.previousHash.equals(previousBlock.hash)) {
+        if (!newBlock.getPreviousHash().equals(previousBlock.getHash())) {
             return false;
         }
 
         // Regra 2 — Integridade: hash armazenado == hash recalculado a partir
         // dos dados atuais. Detecta adulteração após mineração.
-        if (!newBlock.hash.equals(newBlock.calculateHash())) {
+        if (!newBlock.getHash().equals(newBlock.calculateHash())) {
             return false;
         }
 
         // Regra 3 — Proof-of-Work: o hash tem de satisfazer a dificuldade.
         // hashPrefix está pré-calculado no construtor — sem alocações aqui.
-        return newBlock.hash.startsWith(this.hashPrefix);
+        return newBlock.getHash().startsWith(this.hashPrefix);
     }
 
 
