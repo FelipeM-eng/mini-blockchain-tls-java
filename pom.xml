@@ -13,6 +13,7 @@
     <!-- Atualizado para Java 17 (ou 21, se preferires ) -->
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
+    <exec.mainClass>pt.ipvc.ersc.blockchain.app.MainTest</exec.mainClass>
   </properties>
 
   <!-- Onde adicionamos as dependências do projeto -->
@@ -38,7 +39,7 @@
         <artifactId>exec-maven-plugin</artifactId>
         <version>3.1.0</version>
         <configuration>
-          <mainClass>pt.ipvc.ersc.blockchain.MainTest</mainClass>
+          <mainClass>${exec.mainClass}</mainClass>
         </configuration>
       </plugin>
     </plugins>
