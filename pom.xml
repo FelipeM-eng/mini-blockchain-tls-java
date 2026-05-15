@@ -32,14 +32,14 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.11.0</version>
       </plugin>
-      <!-- Plugin para permitir executar o MainTest via terminal -->
+      <!-- Plugin para executar a aplicação principal -->
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>3.1.0</version>
-        <configuration>
-          <mainClass>pt.ipvc.ersc.blockchain.MainTest</mainClass>
-        </configuration>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>3.1.0</version>
+          <configuration>
+              <mainClass>pt.ipvc.ersc.blockchain.app.Main</mainClass>
+          </configuration>
       </plugin>
     </plugins>
   </build>
