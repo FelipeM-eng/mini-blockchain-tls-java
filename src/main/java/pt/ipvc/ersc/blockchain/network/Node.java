@@ -2,6 +2,7 @@ package pt.ipvc.ersc.blockchain.network;
 
 import pt.ipvc.ersc.blockchain.core.Block;
 import pt.ipvc.ersc.blockchain.core.Blockchain;
+import pt.ipvc.ersc.blockchain.exception.InvalidBlockException;
 import pt.ipvc.ersc.blockchain.exception.MalformedBlockException;
 
 import java.io.BufferedReader;
@@ -126,20 +127,17 @@ public class Node {
         return new Block(parts[0], parts[1], timestamp, nonce, parts[4]);
     }
 
-    // minerar bloco localmente
-    public Block mineBlock(String data) {
-
-        Block block = new Block(
-                data,
-                blockchain.getLatestBlock().getHash()
-        );
-
-        block.mineBlock(blockchain.getDifficulty());
-
-        // adicionar localmente
-        blockchain.addReceivedBlock(block);
-
-        return block;
+    /**
+     * Minera um bloco com os dados fornecidos e adiciona-o à blockchain local.
+     * Delega na Blockchain.addBlock — esta valida o bloco minerado contra as
+     * regras de consenso antes de o adicionar à cadeia.
+     *
+     * @throws InvalidBlockException se o bloco minerado falhar a validação
+     *         (não devia acontecer com mineBlock correcto, mas a Blockchain
+     *         valida defensivamente).
+     */
+    public Block mineBlock(String data) throws InvalidBlockException {
+        return blockchain.addBlock(data);
     }
 
     // enviar bloco para outro nó
