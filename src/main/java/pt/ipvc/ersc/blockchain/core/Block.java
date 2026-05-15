@@ -21,6 +21,10 @@ import java.util.Base64;
  * setters públicos. Isto impede que outras classes mutilem um bloco já minerado
  * — propriedade essencial para a noção de "registo imutável" em blockchain.
  *
+ * Nota: nonce é long (64 bits) e não int. Em dificuldades elevadas (8+),
+ * a procura PoW pode exceder os 2.1 mil milhões de tentativas que cabem
+ * num int — long elimina o risco de wrap-around para valores negativos.
+ * 
  * Responsável: Samuel Ferreira (33846).
  */
 public class Block {
@@ -29,7 +33,7 @@ public class Block {
     private final String previousHash;
     private final long timestamp;
 
-    private int nonce;
+    private long nonce;
     private String hash;
 
     /**
@@ -53,7 +57,7 @@ public class Block {
          * Blockchain — propriedade essencial para que nós independentes
          * concordem no mesmo génesis e possam validar blocos uns dos outros.
          */
-        public Block(String data, String previousHash, long timestamp, int nonce) {
+        public Block(String data, String previousHash, long timestamp, long nonce) {
             this.data         = data;
             this.previousHash = previousHash;
             this.timestamp    = timestamp;
@@ -71,7 +75,7 @@ public class Block {
     public Block(String data,
                  String previousHash,
                  long timestamp,
-                 int nonce,
+                 long nonce,
                  String hash) {
         this.data         = data;
         this.previousHash = previousHash;
@@ -149,7 +153,7 @@ public class Block {
         return timestamp;
     }
 
-    public int getNonce() {
+    public long getNonce() {
         return nonce;
     }
 

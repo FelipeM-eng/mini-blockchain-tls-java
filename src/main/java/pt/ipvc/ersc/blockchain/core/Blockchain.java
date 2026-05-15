@@ -29,7 +29,7 @@ public final class Blockchain {
     // nó teria um génesis com timestamp/hash diferente e não conseguiriam
     // sincronizar a partir do bloco 1.
     private static final long   GENESIS_TIMESTAMP     = 0L;
-    private static final int    GENESIS_NONCE         = 0;
+    private static final long    GENESIS_NONCE        = 0L;
 
     // E definimos o encadeamento da cadeia como uma lista de blocos.
     private final List<Block> chain;

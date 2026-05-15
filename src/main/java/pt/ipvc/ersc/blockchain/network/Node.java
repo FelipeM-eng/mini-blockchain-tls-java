@@ -116,10 +116,10 @@ public class Node {
         }
 
         final long timestamp;
-        final int nonce;
+        final long nonce;
         try {
             timestamp = Long.parseLong(parts[2]);
-            nonce     = Integer.parseInt(parts[3]);
+            nonce     = Long.parseLong(parts[3]);
         } catch (NumberFormatException e) {
             throw new MalformedBlockException(
                 "Timestamp ou nonce não numéricos: timestamp='" + parts[2] +
