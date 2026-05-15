@@ -20,6 +20,15 @@ public class Block {
         this.hash = calculateHash();
     }
 
+    // construtor para o bloco génesis — hash calculado internamente
+    public Block(String data, String previousHash, long timestamp, int nonce) {
+        this.data         = data;
+        this.previousHash = previousHash;
+        this.timestamp    = timestamp;
+        this.nonce        = nonce;
+        this.hash         = calculateHash(); // determinístico — sem System.currentTimeMillis()
+    }
+
     // reconstruir bloco vindo da rede
     public Block(String data,
                  String previousHash,

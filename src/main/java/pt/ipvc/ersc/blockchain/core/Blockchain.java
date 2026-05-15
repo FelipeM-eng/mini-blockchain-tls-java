@@ -72,15 +72,23 @@ public final class Blockchain {
     previousHash = "0" por convenção — não existe bloco anterior.
      */
     private Block createGenesisBlock() {
-        // Dado que o bloco genesis é criado internamente ao ser chamado pelo construtor principal
-        Block genesis = new Block(GENESIS_DATA, GENESIS_PREVIOUS_HASH);
 
-        // quando mineramos o bloco génesis, então chamamos o método mineBlock() do bloco, passando a dificuldade configurada.
-        genesis.mineBlock(this.difficulty);
+    // ✔ valores FIXOS (iguais em todas as máquinas)
+    long genesisTimestamp = 0L;
+    int genesisNonce = 0;
 
-        // então retornamos o bloco génesis criado e minerado.
-        return genesis;
-    }
+    Block genesis = new Block(
+        GENESIS_DATA,
+        GENESIS_PREVIOUS_HASH,
+        genesisTimestamp,
+        genesisNonce
+    );
+
+    // ✔ hash determinístico (SEM mineração)
+    genesis.hash = genesis.calculateHash();
+
+    return genesis;
+}
 
     /**
      Devolve o último bloco da cadeia.
