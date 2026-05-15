@@ -11,6 +11,9 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 public class Node {
 
     private final int port;
@@ -124,7 +127,21 @@ public class Node {
             );
         }
 
-        return new Block(parts[0], parts[1], timestamp, nonce, parts[4]);
+        // O campo data foi codificado em Base64 em Block.toNetworkString para
+        // garantir que não colide com o separador '|'.
+        final String dataDecoded;
+        try {
+            dataDecoded = new String(
+                Base64.getDecoder().decode(parts[0]),
+                StandardCharsets.UTF_8
+            );
+        } catch (IllegalArgumentException e) {
+            throw new MalformedBlockException(
+                "Campo 'data' não é Base64 válido: " + parts[0], e
+            );
+        }
+
+        return new Block(dataDecoded, parts[1], timestamp, nonce, parts[4]);
     }
 
     /**

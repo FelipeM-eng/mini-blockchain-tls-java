@@ -2,6 +2,9 @@ package pt.ipvc.ersc.blockchain.core;
 
 import pt.ipvc.ersc.blockchain.utils.HashUtil;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 /**
  * Block — unidade fundamental da blockchain.
  *
@@ -112,17 +115,22 @@ public class Block {
     /**
      * Serialização para envio em rede.
      * Formato pipe-delimited com 5 campos por esta ordem:
-     *   data | previousHash | timestamp | nonce | hash
+     *   dataBase64 | previousHash | timestamp | nonce | hash
      *
-     * Limitação conhecida: se 'data' contiver o caracter '|', a desserialização
-     * parte-se. Resolvido em commit posterior (codificação Base64 do data).
+     * O campo 'data' é codificado em Base64 (URL-safe, sem padding) para
+     * garantir que nunca contém o separador '|'. previousHash e hash são
+     * já hex (0-9 a-f), timestamp e nonce são numéricos — nenhum precisa de
+     * codificação adicional.
      */
     public String toNetworkString() {
-        return data + "|" +
-               previousHash + "|" +
-               timestamp + "|" +
-               nonce + "|" +
-               hash;
+        String dataB64 = Base64.getEncoder()
+            .encodeToString(data.getBytes(StandardCharsets.UTF_8));
+
+        return dataB64 + "|" +
+            previousHash + "|" +
+            timestamp + "|" +
+            nonce + "|" +
+            hash;
     }
 
     // ------------------------------------------------------------------
