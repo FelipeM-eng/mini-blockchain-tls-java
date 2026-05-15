@@ -20,7 +20,13 @@ public class Block {
         this.hash = calculateHash();
     }
 
-    // construtor para o bloco génesis — hash calculado internamente
+    /**
+    * Cria um bloco com timestamp e nonce fixos.
+    * Usado para o bloco génesis: como todos os campos são determinísticos
+    * (constantes), o hash resultante é idêntico em qualquer instância da
+    * Blockchain — propriedade essencial para que nós independentes
+    * concordem no mesmo génesis e possam validar blocos uns dos outros.
+    */
     public Block(String data, String previousHash, long timestamp, int nonce) {
         this.data         = data;
         this.previousHash = previousHash;

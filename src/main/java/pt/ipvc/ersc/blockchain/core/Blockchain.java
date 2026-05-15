@@ -68,12 +68,15 @@ public final class Blockchain {
    
     /**
     Cria o bloco inicial da cadeia.
-    Usa o construtor Block(String data, String previousHash).
-    previousHash = "0" por convenção — não existe bloco anterior.
+    Génesis com timestamp/nonce fixos — hash é totalmente determinístico,
+    logo igual em todos os nós. Não é minerado: o génesis é um caso
+    especial que não precisa de satisfazer o PoW (a regra de PoW só se
+    aplica a blocos validados em isValidNewBlock, e o génesis é
+    excluído desse caminho — ver loop em isChainValid que começa em i=1).
      */
     private Block createGenesisBlock() {
 
-    // ✔ valores FIXOS (iguais em todas as máquinas)
+    // valores FIXOS (iguais em todas as máquinas)
     long genesisTimestamp = 0L;
     int genesisNonce = 0;
 
@@ -84,7 +87,7 @@ public final class Blockchain {
         genesisNonce
     );
 
-    // ✔ hash determinístico (SEM mineração)
+    // hash determinístico (SEM mineração)
     genesis.hash = genesis.calculateHash();
 
     return genesis;
