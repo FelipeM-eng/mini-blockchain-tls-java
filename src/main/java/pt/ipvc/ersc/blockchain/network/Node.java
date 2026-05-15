@@ -2,6 +2,7 @@ package pt.ipvc.ersc.blockchain.network;
 
 import pt.ipvc.ersc.blockchain.core.Block;
 import pt.ipvc.ersc.blockchain.core.Blockchain;
+import pt.ipvc.ersc.blockchain.exception.MalformedBlockException;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -71,11 +72,15 @@ public class Node {
                             System.out.println("[NODE " + port + "] Bloco rejeitado!");
                         }
 
-                    } catch (Exception e) {
-
-                        System.out.println(
-                                "[NODE " + port + "] Erro ao processar ligação"
-                        );
+                    } catch (MalformedBlockException e) {
+                        System.out.println("[NODE " + port + "] Mensagem malformada ignorada: "
+                            + e.getMessage());
+                    } catch (java.io.IOException e) {
+                        System.out.println("[NODE " + port + "] Erro de I/O na ligação: "
+                            + e.getMessage());
+                    } catch (RuntimeException e) {
+                        System.out.println("[NODE " + port + "] Erro inesperado ("
+                            + e.getClass().getSimpleName() + "): " + e.getMessage());
                     }
                 }
 
@@ -86,22 +91,39 @@ public class Node {
         }).start();
     }
 
-    // converter string recebida em bloco
-    private Block parseBlock(String message) {
-
-        String[] parts = message.split("\\|");
-
-        if (parts.length != 5) {
-            throw new RuntimeException("Formato inválido");
+    /**
+     * Reconstrói um Block a partir da string serializada por Block.toNetworkString.
+     * Formato esperado: data|previousHash|timestamp|nonce|hash
+     *
+     * Lança MalformedBlockException com mensagem específica quando a string
+     * está corrompida — para que o chamador possa logar a causa em vez de
+     * cair num "Erro ao processar ligação" sem detalhe.
+     */
+    private Block parseBlock(String message) throws MalformedBlockException {
+        if (message == null || message.isBlank()) {
+            throw new MalformedBlockException("Mensagem vazia ou nula.");
         }
 
-        return new Block(
-                parts[0],
-                parts[1],
-                Long.parseLong(parts[2]),
-                Integer.parseInt(parts[3]),
-                parts[4]
-        );
+        String[] parts = message.split("\\|");
+        if (parts.length != 5) {
+            throw new MalformedBlockException(
+                "Esperados 5 campos separados por '|'. Recebidos: " + parts.length
+            );
+        }
+
+        final long timestamp;
+        final int nonce;
+        try {
+            timestamp = Long.parseLong(parts[2]);
+            nonce     = Integer.parseInt(parts[3]);
+        } catch (NumberFormatException e) {
+            throw new MalformedBlockException(
+                "Timestamp ou nonce não numéricos: timestamp='" + parts[2] +
+                "', nonce='" + parts[3] + "'", e
+            );
+        }
+
+        return new Block(parts[0], parts[1], timestamp, nonce, parts[4]);
     }
 
     // minerar bloco localmente
