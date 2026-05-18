@@ -2,12 +2,17 @@ package pt.ipvc.ersc.blockchain.network;
 
 import pt.ipvc.ersc.blockchain.core.Block;
 import pt.ipvc.ersc.blockchain.core.Blockchain;
+import pt.ipvc.ersc.blockchain.exception.InvalidBlockException;
+import pt.ipvc.ersc.blockchain.exception.MalformedBlockException;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class Node {
 
@@ -71,11 +76,15 @@ public class Node {
                             System.out.println("[NODE " + port + "] Bloco rejeitado!");
                         }
 
-                    } catch (Exception e) {
-
-                        System.out.println(
-                                "[NODE " + port + "] Erro ao processar ligação"
-                        );
+                    } catch (MalformedBlockException e) {
+                        System.out.println("[NODE " + port + "] Mensagem malformada ignorada: "
+                            + e.getMessage());
+                    } catch (java.io.IOException e) {
+                        System.out.println("[NODE " + port + "] Erro de I/O na ligação: "
+                            + e.getMessage());
+                    } catch (RuntimeException e) {
+                        System.out.println("[NODE " + port + "] Erro inesperado ("
+                            + e.getClass().getSimpleName() + "): " + e.getMessage());
                     }
                 }
 
@@ -86,38 +95,66 @@ public class Node {
         }).start();
     }
 
-    // converter string recebida em bloco
-    private Block parseBlock(String message) {
-
-        String[] parts = message.split("\\|");
-
-        if (parts.length != 5) {
-            throw new RuntimeException("Formato inválido");
+    /**
+     * Reconstrói um Block a partir da string serializada por Block.toNetworkString.
+     * Formato esperado: data|previousHash|timestamp|nonce|hash
+     *
+     * Lança MalformedBlockException com mensagem específica quando a string
+     * está corrompida — para que o chamador possa logar a causa em vez de
+     * cair num "Erro ao processar ligação" sem detalhe.
+     */
+    private Block parseBlock(String message) throws MalformedBlockException {
+        if (message == null || message.isBlank()) {
+            throw new MalformedBlockException("Mensagem vazia ou nula.");
         }
 
-        return new Block(
-                parts[0],
-                parts[1],
-                Long.parseLong(parts[2]),
-                Integer.parseInt(parts[3]),
-                parts[4]
-        );
+        String[] parts = message.split("\\|");
+        if (parts.length != 5) {
+            throw new MalformedBlockException(
+                "Esperados 5 campos separados por '|'. Recebidos: " + parts.length
+            );
+        }
+
+        final long timestamp;
+        final long nonce;
+        try {
+            timestamp = Long.parseLong(parts[2]);
+            nonce     = Long.parseLong(parts[3]);
+        } catch (NumberFormatException e) {
+            throw new MalformedBlockException(
+                "Timestamp ou nonce não numéricos: timestamp='" + parts[2] +
+                "', nonce='" + parts[3] + "'", e
+            );
+        }
+
+        // O campo data foi codificado em Base64 em Block.toNetworkString para
+        // garantir que não colide com o separador '|'.
+        final String dataDecoded;
+        try {
+            dataDecoded = new String(
+                Base64.getDecoder().decode(parts[0]),
+                StandardCharsets.UTF_8
+            );
+        } catch (IllegalArgumentException e) {
+            throw new MalformedBlockException(
+                "Campo 'data' não é Base64 válido: " + parts[0], e
+            );
+        }
+
+        return new Block(dataDecoded, parts[1], timestamp, nonce, parts[4]);
     }
 
-    // minerar bloco localmente
-    public Block mineBlock(String data) {
-
-        Block block = new Block(
-                data,
-                blockchain.getLatestBlock().getHash()
-        );
-
-        block.mineBlock(blockchain.getDifficulty());
-
-        // adicionar localmente
-        blockchain.addReceivedBlock(block);
-
-        return block;
+    /**
+     * Minera um bloco com os dados fornecidos e adiciona-o à blockchain local.
+     * Delega na Blockchain.addBlock — esta valida o bloco minerado contra as
+     * regras de consenso antes de o adicionar à cadeia.
+     *
+     * @throws InvalidBlockException se o bloco minerado falhar a validação
+     *         (não devia acontecer com mineBlock correcto, mas a Blockchain
+     *         valida defensivamente).
+     */
+    public Block mineBlock(String data) throws InvalidBlockException {
+        return blockchain.addBlock(data);
     }
 
     // enviar bloco para outro nó

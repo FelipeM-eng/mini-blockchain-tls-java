@@ -29,7 +29,7 @@ public final class Blockchain {
     // nó teria um génesis com timestamp/hash diferente e não conseguiriam
     // sincronizar a partir do bloco 1.
     private static final long   GENESIS_TIMESTAMP     = 0L;
-    private static final int    GENESIS_NONCE         = 0;
+    private static final long    GENESIS_NONCE        = 0L;
 
     // E definimos o encadeamento da cadeia como uma lista de blocos.
     private final List<Block> chain;
@@ -104,21 +104,16 @@ public final class Blockchain {
      A Blockchain constrói o bloco internamente — o chamador nunca
      recebe um bloco não minerado, eliminando estados inconsistentes.
      */
-    public synchronized void addBlock(String data) throws InvalidBlockException {
-        // Dado que os dados do bloco não podem ser nulos ou vazios, então lançamos uma exceção caso sejam inválidos.
+    public synchronized Block addBlock(String data) throws InvalidBlockException {
         if (data == null || data.isBlank()) {
             throw new IllegalArgumentException("Dados do bloco inválidos.");
         }
 
-        // e então criamos um novo bloco usando o construtor Block(String data, String previousHash), passando os dados recebidos e o hash do último bloco da cadeia.
         Block previousBlock = getLatestBlock();
         Block newBlock      = new Block(data, previousBlock.getHash());
 
-        // quando é minerado o bloco, então chamamos o método mineBlock() do bloco, passando a dificuldade configurada.
         newBlock.mineBlock(this.difficulty);
 
-        
-        // então valida se o bloco recém-minerado é válido antes de adicioná-lo à cadeia.
         if (!isValidNewBlock(newBlock, previousBlock)) {
             throw new InvalidBlockException(
                 "Bloco recém-minerado falhou na validação de consenso. " +
@@ -126,8 +121,8 @@ public final class Blockchain {
             );
         }
 
-        // e finalmente adicionamos o bloco minerado à cadeia.
         this.chain.add(newBlock);
+        return newBlock;
     }
 
    
