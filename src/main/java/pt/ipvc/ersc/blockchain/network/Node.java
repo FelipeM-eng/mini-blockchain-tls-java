@@ -242,6 +242,10 @@ public class Node {
             ) {
 
                 out.println(block.toNetworkString());
+                out.flush();
+
+                // Pequena pausa para o servidor concluir readLine() antes do fecho do socket.
+                Thread.sleep(300);
 
                 System.out.println(
                         "[NODE " + port + "] Bloco enviado via TLS para porta "
