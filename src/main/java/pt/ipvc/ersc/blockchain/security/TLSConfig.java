@@ -36,8 +36,6 @@ import java.security.KeyStore;
  * no código com valores conhecidos. Em produção, viriam de variáveis de
  * ambiente, um cofre de segredos (HashiCorp Vault, AWS KMS) ou injecção
  * em deploy — nunca versionadas no repositório.
- *
- * Responsável: Samuel Ferreira (33846) — Semana 2/3, infraestrutura TLS.
  */
 public final class TLSConfig {
 

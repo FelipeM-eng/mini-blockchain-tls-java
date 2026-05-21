@@ -93,10 +93,7 @@ Testes manuais no terminal:
 mvn exec:java -Dexec.mainClass=pt.ipvc.ersc.blockchain.app.MainTest
 
 # Ver se os certificados e o TLS arrancam
-mvn exec:java -Dexec.mainClass=pt.ipvc.ersc.blockchain.app.TLSTest
-
-# Dois nós em localhost com TLS (script)
-mvn exec:java -Dexec.mainClass=pt.ipvc.ersc.blockchain.app.IntegrationTest
+mvn exec:java "-Dexec.mainClass=pt.ipvc.ersc.blockchain.app.TLSTest"
 
 # Nós A e B no mesmo programa
 mvn exec:java -Dexec.mainClass=pt.ipvc.ersc.blockchain.app.Main
