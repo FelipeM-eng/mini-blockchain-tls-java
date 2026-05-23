@@ -77,7 +77,10 @@ public final class TLSConfig {
      * apenas se for necessário sobrescrever path ou password.
      */
     public static SSLContext buildServerContext()
+        // lança uma exceção se a segurança geral lançar uma exceção ou se a entrada/saída lançar uma exceção.
             throws GeneralSecurityException, IOException {
+
+        // chama o metodo buildServerContext() com os defaults do projeto (server-keystore.jks com password 'changeit').
         return buildServerContext(
             DEFAULT_SERVER_KEYSTORE_PATH,
             DEFAULT_PASSWORD,
@@ -100,6 +103,7 @@ public final class TLSConfig {
                                                 char[] keyPassword)
             throws GeneralSecurityException, IOException {
 
+        // carrega o keystore a partir do ficheiro.
         KeyStore ks = loadKeyStore(keystorePath, storePassword);
 
         KeyManagerFactory kmf =
