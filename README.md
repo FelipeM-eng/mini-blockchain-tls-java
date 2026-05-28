@@ -90,26 +90,24 @@ Testes manuais no terminal:
 
 ```bash
 # Núcleo blockchain (génesis, PoW, validação)
-mvn exec:java -Dexec.mainClass=pt.ipvc.ersc.blockchain.app.MainTest
+mvn exec:java "-Dexec.mainClass=pt.ipvc.ersc.blockchain.app.MainTest"
 
 # Ver se os certificados e o TLS arrancam
 mvn exec:java "-Dexec.mainClass=pt.ipvc.ersc.blockchain.app.TLSTest"
 
 # Nós A e B no mesmo programa
-mvn exec:java -Dexec.mainClass=pt.ipvc.ersc.blockchain.app.Main
+mvn exec:java "-Dexec.mainClass=pt.ipvc.ersc.blockchain.app.Main"
 
 # teste do NodeApp em localhost
 mvn exec:java "-Dexec.mainClass=pt.ipvc.ersc.blockchain.app.NodeApp" "-Dexec.args=--port 5001 --peer-host localhost --peer-port 5000"
 
 # NodeApp entre dois PCs na rede
 # No PC A (troca o IP pelo do PC B):
-mvn exec:java "-Dexec.mainClass=pt.ipvc.ersc.blockchain.app.NodeApp" "-Dexec.args=--port 5000 --peer-host 192.168.1.11 --peer-port 5001"
+mvn exec:java "-Dexec.mainClass=pt.ipvc.ersc.blockchain.app.NodeApp" "-Dexec.args=--port 5000 --peer-host 10.40.250.251 --peer-port 5001"
 
 # No PC B (troca o IP pelo do PC A):
-mvn exec:java "-Dexec.mainClass=pt.ipvc.ersc.blockchain.app.NodeApp" "-Dexec.args=--port 5001 --peer-host 192.168.1.10 --peer-port 5000"
+mvn exec:java "-Dexec.mainClass=pt.ipvc.ersc.blockchain.app.NodeApp" "-Dexec.args=--port 5001 --peer-host 10.40.250.176 --peer-port 5000"
 ```
-
-
 
 O `pom.xml` tem por defeito o `MainTest` se correres só `mvn exec:java`.
 
@@ -133,14 +131,14 @@ New-NetFirewallRule -DisplayName "Node5000" -Direction Inbound -Protocol TCP -Lo
 New-NetFirewallRule -DisplayName "Node5001" -Direction Inbound -Protocol TCP -LocalPort 5001 -Action Allow
 ```
 
-5. Testar `ping` entre os dois IPs.
+5. Testar entre os dois IPs.
 
 ### PC A (porta 5000, envia para o B)
 
 Substituir o IP pelo do PC B:
 
 ```powershell
-mvn exec:java "-Dexec.mainClass=pt.ipvc.ersc.blockchain.app.NodeApp" "-Dexec.args=--port 5000 --peer-host 192.168.1.11 --peer-port 5001"
+mvn exec:java "-Dexec.mainClass=pt.ipvc.ersc.blockchain.app.NodeApp" "-Dexec.args=--port 5000 --peer-host 10.40.250.251 --peer-port 5001"
 ```
 
 ### PC B (porta 5001, envia para o A)
@@ -148,7 +146,40 @@ mvn exec:java "-Dexec.mainClass=pt.ipvc.ersc.blockchain.app.NodeApp" "-Dexec.arg
 Substituir o IP pelo do PC A:
 
 ```powershell
-mvn exec:java "-Dexec.mainClass=pt.ipvc.ersc.blockchain.app.NodeApp" "-Dexec.args=--port 5001 --peer-host 192.168.1.10 --peer-port 5000"
+mvn exec:java "-Dexec.mainClass=pt.ipvc.ersc.blockchain.app.NodeApp" "-Dexec.args=--port 5001 --peer-host 10.40.250.176 --peer-port 5000"
+```
+```bash
+### Gerar server-keystore.jks
+keytool -genkeypair `
+-alias server `
+-keyalg RSA `
+-keysize 2048 `
+-validity 365 `
+-keystore server-keystore.jks `
+-storepass changeit `
+-keypass changeit `
+-dname "CN=BlockchainNode, OU=ERSC, O=IPVC, L=VianaDoCastelo, ST=VianaDoCastelo, C=PT" `
+-ext "SAN=DNS:localhost,IP:127.0.0.1,IP:10.40.250.176,IP:192.168.1.11"
+
+### Exportar o certificado (server-cert.cer)
+
+keytool -exportcert `
+-alias server `
+-keystore server-keystore.jks `
+-storepass changeit `
+-rfc `
+-file server-cert.cer
+
+### Criar o client-truststore.jks
+keytool -importcert `
+-alias server `
+-file server-cert.cer `
+-keystore client-truststore.jks `
+-storepass changeit `
+-noprompt
+
+
+
 ```
 
 ### Ordem na apresentação

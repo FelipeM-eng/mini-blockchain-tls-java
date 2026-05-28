@@ -14,8 +14,6 @@ import pt.ipvc.ersc.blockchain.exception.InvalidChainException;
  *  - adição e validação de blocos minerados localmente
  *  - rejeição de blocos com encadeamento inválido
  *  - validação dos parâmetros de entrada
- *
- * Responsável: Samuel Ferreira (33846) — Semana 1.
  */
 public class MainTest {
 

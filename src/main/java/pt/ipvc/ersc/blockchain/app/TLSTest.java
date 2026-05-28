@@ -11,8 +11,6 @@ import javax.net.ssl.SSLContext;
  * e os algoritmos pedidos são suportados pelo JDK.
  *
  * Não envolve rede — só inicialização criptográfica.
- *
- * Responsável: Samuel Ferreira (33846).
  */
 public class TLSTest {
 

@@ -24,8 +24,6 @@ import java.util.Base64;
  * Nota: nonce é long (64 bits) e não int. Em dificuldades elevadas (8+),
  * a procura PoW pode exceder os 2.1 mil milhões de tentativas que cabem
  * num int — long elimina o risco de wrap-around para valores negativos.
- * 
- * Responsável: Samuel Ferreira (33846).
  */
 public class Block {
 

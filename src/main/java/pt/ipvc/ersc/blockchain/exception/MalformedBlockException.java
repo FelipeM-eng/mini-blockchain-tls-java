@@ -9,8 +9,6 @@ package pt.ipvc.ersc.blockchain.exception;
  * Distinta de InvalidBlockException: aqui o problema é sintáctico (não
  * conseguimos sequer reconstruir o objecto Block); naquela o bloco existe
  * mas falha as regras de consenso (encadeamento, PoW, integridade).
- *
- * Responsável: Samuel Ferreira (33846).
  */
 public class MalformedBlockException extends Exception {
 
